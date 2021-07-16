@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 
 from flask import Blueprint
 from flask import render_template, request, redirect, url_for, jsonify
@@ -56,7 +57,7 @@ def pet_info(pid):
     data = dict(id = pid,
                 name = name,
                 bought = format_date(bought),
-                sold = sold,
+                sold = format_date(sold),
                 description = description, #TODO Not being displayed
                 species = species,
                 tags = tags)
@@ -84,10 +85,9 @@ def edit(pid):
         description = request.form.get('description')
         cursor.execute("update pet set description= ? where id= ?",[description, pid])
         sold = request.form.get("sold")
-        if sold == "1":
-										sold = datetime.datetime.now().strftime("%Y-%m-%d")
-									
-										cursor.execute("update pet set sold= ? where id= ?",[sold, pid])
+        now =date.today()
+        cursor.execute(f"update pet set sold='{now}' where id='{pid}'")
+        conn.commit()
 			
         conn.commit()
         return redirect(url_for("pets.pet_info", pid=pid), 302)
